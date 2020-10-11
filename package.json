@@ -5,10 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "sqlite3 db/election.db < db/schema.sql",
-    "seed": "sqlite3 db/election.db < db/seeds.sql",
-    "db": "sqlite3 db/election.db",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +19,8 @@
   "homepage": "https://github.com/reynolkb/employee-tracker#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "inquirer": "^7.3.3"
+    "inquirer": "^7.3.3",
+    "mysql2": "^2.2.5",
+    "sqlite3": "^5.0.0"
   }
 }
