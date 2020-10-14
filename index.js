@@ -91,27 +91,34 @@ const addADept = () => {
 }
 
 const addARole = () => {
-    return inquirer.prompt([
-        {
-            type: 'input',
-            name: 'roleName',
-            message: 'Enter the role name'
-        },
-        {
-            type: 'input',
-            name: 'roleSalary',
-            message: 'Enter the role salary'
-        },
-        {
-            type: 'input',
-            name: 'roleDepartment',
-            message: 'Enter the department id'
-        },
-    ])
-        .then(data => {
-            connection.promise().query(`INSERT INTO role (title, salary, department_id) VALUES ('${data.roleName}', '${data.roleSalary}', '${data.roleDepartment}')`)
-                .then(([rows]) => {
-                    console.table(rows);
+    const sql = `SELECT department.id, department.name FROM department`;
+
+    connection.promise().query(sql)
+        .then(([rows]) => {
+            console.log(rows);
+            const departmentArr = rows.map(row => ({ name: row.name, value: row.id }));
+
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'title',
+                    message: 'Enter the role title'
+                },
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'Enter the role salary'
+                },
+                {
+                    type: 'list',
+                    name: 'department_id',
+                    message: 'Pick the department',
+                    choices: departmentArr
+                }])
+                .then(result => {
+                    connection.promise().query(
+                        "INSERT INTO role SET ?", result
+                    )
                 })
                 .then(() => startApplication())
                 .catch(err => {
@@ -121,100 +128,86 @@ const addARole = () => {
 }
 
 const addAnEmployee = () => {
-    return inquirer.prompt([
-        {
-            type: 'input',
-            name: 'employeeFirstName',
-            message: 'Enter the first name'
-        },
-        {
-            type: 'input',
-            name: 'employeeLastName',
-            message: 'Enter the last name'
-        },
-        {
-            type: 'input',
-            name: 'employeeDepartment',
-            message: 'Enter the department id'
-        },
-        {
-            type: 'input',
-            name: 'employeeManager',
-            message: 'Enter the manager id'
-        },
-    ])
-        .then(data => {
-            connection.promise().query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${data.employeeFirstName}', '${data.employeeLastName}', '${data.employeeDepartment}', '${data.employeeManager}')`)
+    const sql = `SELECT role.id, role.title FROM role`;
+    const sql2 = `SELECT employee.id, employee.first_name, employee.last_name FROM employee`;
+
+    connection.promise().query(sql)
+        .then(([rows]) => {
+            console.log(rows);
+            const roleArr = rows.map(row => ({ name: row.title, value: row.id }));
+            connection.promise().query(sql2)
                 .then(([rows]) => {
-                    console.table(rows);
-                })
-                .then(() => startApplication())
-                .catch(err => {
-                    console.log(err);
+                    console.log(rows);
+                    const managerArr = rows.map(row => ({ name: row.first_name + " " + row.last_name, value: row.id }));
+
+                    inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'first_name',
+                            message: 'Enter the first name'
+                        },
+                        {
+                            type: 'input',
+                            name: 'last_name',
+                            message: 'Enter the last name'
+                        },
+                        {
+                            type: 'list',
+                            name: 'role_id',
+                            message: 'Pick the role',
+                            choices: roleArr
+                        },
+                        {
+                            type: 'list',
+                            name: 'manager_id',
+                            message: 'Pick the manager',
+                            choices: [...managerArr, { name: "NONE", value: null }]
+                        }])
+                        .then(result => {
+                            connection.promise().query(
+                                "INSERT INTO employee SET ?", result
+                            )
+                        })
+                        .then(() => startApplication())
+                        .catch(err => {
+                            console.log(err);
+                        })
                 })
         })
 }
 
 const updateEmployeeRole = () => {
-    const sql = `SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS employee FROM employee`
-    var employeeArr = [];
+    const sql = `SELECT role.id, role.title FROM role`;
+    const sql2 = `SELECT employee.id, CONCAT(employee.first_name, ' ', employee.last_name) as employee FROM employee`;
 
     connection.promise().query(sql)
         .then(([rows]) => {
-            console.log(rows[0].employee);
-            for (var i = 0; i < rows.length; i++) {
-                employeeArr.push(rows[i].employee);
-            }
-            return employeeArr;
-        })
-        .then(employeeArr => {
-            inquirer.prompt([
-                {
-                    type: 'list',
-                    name: 'updateEmployee',
-                    message: 'Pick the employee to update',
-                    choices: employeeArr
-                },
-                {
-                    type: 'list',
-                    name: 'updateEmployeeRole',
-                    message: 'Pick the role to update to',
-                    choices: ['Salesperson', 'Sales Lead', 'Software Engineer', 'Lead Engineer', 'Accountant', 'Lawyer', 'Legal Team Lead']
-                },
-            ])
-                .then(data => {
-                    var first_name = data.updateEmployee.split(" ")[0];
-                    var last_name = data.updateEmployee.split(" ")[1];
-                    var role_id = 0;
+            console.log(rows);
+            const roleArr = rows.map(row => ({ name: row.title, value: row.id }));
+            connection.promise().query(sql2)
+                .then(([rows]) => {
+                    console.log(rows);
+                    const employeeArr = rows.map(row => ({ name: row.employee, value: row.id }));
 
-                    console.log(first_name, last_name);
-
-                    if (data.updateEmployeeRole === 'Salesperson') {
-                        role_id = 1;
-                    }
-                    else if (data.updateEmployeeRole === 'Sales Lead') {
-                        role_id = 2;
-                    }
-                    else if (data.updateEmployeeRole === 'Software Engineer') {
-                        role_id = 3;
-                    }
-                    else if (data.updateEmployeeRole === 'Lead Engineer') {
-                        role_id = 4;
-                    }
-                    else if (data.updateEmployeeRole === 'Accountant') {
-                        role_id = 5;
-                    }
-                    else if (data.updateEmployeeRole === 'Lawyer') {
-                        role_id = 6;
-                    }
-                    else if (data.updateEmployeeRole === 'Legal Team Lead') {
-                        role_id = 7;
-                    }
-
-                    connection.promise().query(`UPDATE employee SET role_id = ${role_id} WHERE first_name = '${first_name}' AND last_name = '${last_name}';`)
-                        .then(([rows]) => {
-                            console.table(rows);
+                    inquirer.prompt([
+                        {
+                            type: 'list',
+                            name: 'id',
+                            message: 'Pick the employee',
+                            choices: employeeArr
+                        },
+                        {
+                            type: 'list',
+                            name: 'role_id',
+                            message: 'Pick the role',
+                            choices: roleArr
+                        }])
+                        .then(result => {
+                            connection.promise().query(
+                                "UPDATE employee SET role_id = ? WHERE id = ?", [result.role_id, result.id]
+                            )
                         })
+                        // .then(() => viewAllEmployees())
                         .then(() => startApplication())
                         .catch(err => {
                             console.log(err);
