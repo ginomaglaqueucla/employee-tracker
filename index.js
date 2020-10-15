@@ -103,7 +103,6 @@ const addARole = () => {
 
     connection.promise().query(sql)
         .then(([rows]) => {
-            console.log(rows);
             const departmentArr = rows.map(row => ({ name: row.name, value: row.id }));
 
             inquirer.prompt([
@@ -142,11 +141,9 @@ const addAnEmployee = () => {
 
     connection.promise().query(sql)
         .then(([rows]) => {
-            console.log(rows);
             const roleArr = rows.map(row => ({ name: row.title, value: row.id }));
             connection.promise().query(sql2)
                 .then(([rows]) => {
-                    console.log(rows);
                     const managerArr = rows.map(row => ({ name: row.first_name + " " + row.last_name, value: row.id }));
 
                     inquirer.prompt([
@@ -192,11 +189,9 @@ const updateEmployeeRole = () => {
 
     connection.promise().query(sql)
         .then(([rows]) => {
-            console.log(rows);
             const roleArr = rows.map(row => ({ name: row.title, value: row.id }));
             connection.promise().query(sql2)
                 .then(([rows]) => {
-                    console.log(rows);
                     const employeeArr = rows.map(row => ({ name: row.employee, value: row.id }));
 
                     inquirer.prompt([
@@ -231,7 +226,6 @@ const removeEmployee = () => {
 
     connection.promise().query(sql)
         .then(([rows]) => {
-            console.log(rows);
             const employeeArr = rows.map(row => ({ name: row.employee, value: row.id }));
 
             inquirer.prompt([
