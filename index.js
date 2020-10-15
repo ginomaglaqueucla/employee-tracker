@@ -1,3 +1,4 @@
+const cTable = require('console.table');
 const e = require('express');
 const fs = require('fs');
 const inquirer = require('inquirer');
@@ -9,18 +10,18 @@ const startApplication = () => {
             type: 'list',
             name: 'init',
             message: 'What would you like to do?',
-            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role']
+            choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role', 'Remove An Employee']
         }
     ])
         .then((data) => {
-            if (data.init === 'View All Employees') {
-                viewAllEmployees();
-            }
-            else if (data.init === 'View All Departments') {
+            if (data.init === 'View All Departments') {
                 viewAllDepartments();
             }
             else if (data.init === 'View All Roles') {
                 viewAllRoles();
+            }
+            else if (data.init === 'View All Employees') {
+                viewAllEmployees();
             }
             else if (data.init === 'Add A Department') {
                 addADept();
@@ -34,6 +35,9 @@ const startApplication = () => {
             else if (data.init === 'Update An Employee Role') {
                 updateEmployeeRole();
             }
+            else if (data.init === 'Remove An Employee') {
+                removeEmployee();
+            }
         })
 }
 
@@ -45,6 +49,7 @@ const viewAllEmployees = () => {
     `
     connection.promise().query(sql)
         .then(([rows]) => {
+            console.log("\n");
             console.table(rows);
         })
         .then(() => startApplication());
@@ -55,6 +60,7 @@ const viewAllDepartments = () => {
 
     connection.promise().query(sql)
         .then(([rows]) => {
+            console.log('\n');
             console.table(rows);
         })
         .then(() => startApplication());
@@ -65,9 +71,20 @@ const viewAllRoles = () => {
 
     connection.promise().query(sql)
         .then(([rows]) => {
+            console.log('\n');
             console.table(rows);
         })
         .then(() => startApplication());
+}
+
+const viewAllEmployeesByDepartment = () => {
+    const sql = `SELECT * FROM department`;
+
+    const sql2 = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee
+        LEFT JOIN role ON employee.role_id = role.id
+        LEFT JOIN department ON role.department_id = department.id
+        LEFT JOIN employee manager ON manager.id = employee.manager_id
+    `
 }
 
 const addADept = () => {
@@ -83,6 +100,7 @@ const addADept = () => {
                 .then(([rows]) => {
                     console.table(rows);
                 })
+                .then(() => viewAllDepartments())
                 .then(() => startApplication())
                 .catch(err => {
                     console.log(err);
@@ -120,6 +138,7 @@ const addARole = () => {
                         "INSERT INTO role SET ?", result
                     )
                 })
+                .then(() => viewAllRoles())
                 .then(() => startApplication())
                 .catch(err => {
                     console.log(err);
@@ -168,6 +187,7 @@ const addAnEmployee = () => {
                                 "INSERT INTO employee SET ?", result
                             )
                         })
+                        .then(() => viewAllEmployees())
                         .then(() => startApplication())
                         .catch(err => {
                             console.log(err);
@@ -207,11 +227,40 @@ const updateEmployeeRole = () => {
                                 "UPDATE employee SET role_id = ? WHERE id = ?", [result.role_id, result.id]
                             )
                         })
-                        // .then(() => viewAllEmployees())
+                        .then(() => viewAllEmployees())
                         .then(() => startApplication())
                         .catch(err => {
                             console.log(err);
                         })
+                })
+        })
+}
+
+const removeEmployee = () => {
+    const sql = `SELECT employee.id, CONCAT(employee.first_name, ' ', employee.last_name) as employee FROM employee`;
+
+    connection.promise().query(sql)
+        .then(([rows]) => {
+            console.log(rows);
+            const employeeArr = rows.map(row => ({ name: row.employee, value: row.id }));
+
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'id',
+                    message: 'Pick the employee to remove',
+                    choices: employeeArr
+                }
+            ])
+                .then(result => {
+                    connection.promise().query(
+                        "DELETE FROM employee WHERE id = ?", result.id
+                    )
+                })
+                .then(() => viewAllEmployees())
+                .then(() => startApplication())
+                .catch(err => {
+                    console.log(err);
                 })
         })
 }

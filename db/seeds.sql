@@ -27,4 +27,3 @@ VALUES
     ('Christian', 'Eckenrode', 4, 2);
     
 UPDATE employee SET manager_id = 3 WHERE id = 1
--- INSERT INTO department SET name = 'temp';
