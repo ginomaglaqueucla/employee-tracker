@@ -7,7 +7,7 @@ const connection = require('./db/connection');
 
 // When you start the application prompt the user for what they want to do
 const startApplication = () => {
-    return inquirer.prompt([
+    inquirer.prompt([
         {
             type: 'list',
             name: 'init',
@@ -18,28 +18,28 @@ const startApplication = () => {
         // based on the choice selected run a different function
         .then((data) => {
             if (data.init === 'View All Departments') {
-                viewAllDepartments();
+                return viewAllDepartments();
             }
             else if (data.init === 'View All Roles') {
-                viewAllRoles();
+                return viewAllRoles();
             }
             else if (data.init === 'View All Employees') {
-                viewAllEmployees();
+                return viewAllEmployees();
             }
             else if (data.init === 'Add A Department') {
-                addADept();
+                return addADept();
             }
             else if (data.init === 'Add A Role') {
-                addARole();
+                return addARole();
             }
             else if (data.init === 'Add An Employee') {
-                addAnEmployee();
+                return addAnEmployee();
             }
             else if (data.init === 'Update An Employee Role') {
-                updateEmployeeRole();
+                return updateEmployeeRole();
             }
             else if (data.init === 'Remove An Employee') {
-                removeEmployee();
+                return removeEmployee();
             }
         })
 }
@@ -88,7 +88,7 @@ const viewAllRoles = () => {
 
 // add a department by prompting the user to enter the name
 const addADept = () => {
-    return inquirer.prompt([
+    inquirer.prompt([
         {
             type: 'input',
             name: 'departmentName',
@@ -102,7 +102,6 @@ const addADept = () => {
                     console.table(rows);
                 })
                 .then(() => viewAllDepartments())
-                .then(() => startApplication())
                 .catch(err => {
                     console.log(err);
                 })
@@ -141,7 +140,6 @@ const addARole = () => {
                     )
                 })
                 .then(() => viewAllRoles())
-                .then(() => startApplication())
                 .catch(err => {
                     console.log(err);
                 })
@@ -192,7 +190,6 @@ const addAnEmployee = () => {
                             )
                         })
                         .then(() => viewAllEmployees())
-                        .then(() => startApplication())
                         .catch(err => {
                             console.log(err);
                         })
@@ -234,7 +231,6 @@ const updateEmployeeRole = () => {
                             )
                         })
                         .then(() => viewAllEmployees())
-                        .then(() => startApplication())
                         .catch(err => {
                             console.log(err);
                         })
@@ -266,7 +262,6 @@ const removeEmployee = () => {
                     )
                 })
                 .then(() => viewAllEmployees())
-                .then(() => startApplication())
                 .catch(err => {
                     console.log(err);
                 })
