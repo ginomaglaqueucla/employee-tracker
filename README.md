@@ -25,6 +25,8 @@ Once you've downloaded the code open the zipped folder in an IDE.
 
 Then open the terminal, run 'node index' and answer the prompts. The readme will be generated in the dist folder.
 
+Video Walkthrough: [https://youtu.be/8XB-fpCw1Po](https://youtu.be/8XB-fpCw1Po)
+
 ![screenshot of application](./screenshot.png)
 
 ## Credits
