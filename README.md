@@ -15,7 +15,7 @@ This is an application that allows the user to manage the employees in their MyS
 
 ## Installation
 
-* Navigate to [https://github.com/reynolkb/note-taker](https://github.com/reynolkb/note-taker). 
+* Navigate to [https://github.com/reynolkb/employee-tracker](https://github.com/reynolkb/employee-tracker). 
 * Click the 'code' button and download the zip file.
 * Unzip the file on your computer.
 
