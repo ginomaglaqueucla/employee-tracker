@@ -23,7 +23,7 @@ This is an application that allows the user to manage the employees in their MyS
 
 Once you've downloaded the code open the zipped folder in an IDE.
 
-Then open the terminal, run 'node index' and answer the prompts. The readme will be generated in the dist folder.
+Then open schema.sql and seeds.sql file and copy those into your MySQL workbench. Once you have run those in your workbench you can run npm start to access the database.
 
 Video Walkthrough: [https://youtu.be/8XB-fpCw1Po](https://youtu.be/8XB-fpCw1Po)
 
